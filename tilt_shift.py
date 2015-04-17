@@ -149,3 +149,5 @@ simg = saturate(nimg,30)
 
 cv2.imshow("hai",nimg)
 cv2.imshow("hais",simg)
+
+cv2.waitKey(0)
