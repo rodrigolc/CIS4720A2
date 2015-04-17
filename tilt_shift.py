@@ -88,13 +88,16 @@ ix,iy = -1,-1
 ix2,iy2 = -1,-1
 # mouse callback function
 def get_mouse_point(event,x,y,flags,param):
-    global ix,iy,ix2,iy2
+    global ix,iy,ix2,iy2,image
     print "move", x,y
     print event
     if event == 1: #press down left button
         ix,iy = x,y
     if event == 4: #release left button
         ix2,iy2 = x,y
+        aux = np.copy(image)
+        cv2.line(aux,(ix,iy),(ix2,iy2),(200,100,50),2)
+        cv2.imshow("image",aux)
 
 if ix == -1 and iy == -1:
     ix = 0
