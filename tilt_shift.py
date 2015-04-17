@@ -85,6 +85,26 @@ iy = height/2
 ix2 = width - 1
 iy2 = height/2
 
+def slope(x0, y0, x1, y1):
+    if x0 == x1:
+        return float("inf") if y0 < y1 else -float("inf")
+    return (y1-y0)/float(x1-x0)
+
+
+def fullLine(img, a, b, color):
+    slope_ = slope(a[0], a[1], b[0], b[1])
+
+    if slope_ == float("inf"):
+        p = (a[0],0)
+        q = (a[0],height)
+    else:
+        p,q = (0,0), (width,height)
+        p = (p[0],int(-(a[0] - p[0]) * slope_ + a[1]))
+        q = (q[0],int(-(b[0] - q[0]) * slope_ + b[1]))
+
+    cv2.line(img,p,q,color,2)
+
+
 
 # mouse callback function
 def get_mouse_point(event,x,y,flags,param):
@@ -106,18 +126,17 @@ def get_mouse_point(event,x,y,flags,param):
         y2 = iy2 - dx
         x2 = ix2 + dy
 
-        p1 = ((x2*y1 - x1 * y2) / (y1 - y2),0)
-        p2 = (width,(width*y2 + x2*y1 - x1*y2 - width*y1)/(x2-x1))
+        fullLine(aux,(x1,y1),(x2,y2),(100,200,50))
 
-        cv2.line(aux,p1,p2,(100,200,50),2)
 
-        y1 = iy - dx
-        x1 = ix + dy
-        y2 = iy2 - dx
-        x2 = ix2 + dy
+        # cv2.line(aux,p1,p2,(100,200,50),2)
 
-        p1 = ((x2*y1 - x1 * y2) / (y1 - y2),0)
-        p2 = (width,(width*y2 + x2*y1 - x1*y2 - width*y1)/(x2-x1))
+        y1 = iy + dx
+        x1 = ix - dy
+        y2 = iy2 + dx
+        x2 = ix2 - dy
+        fullLine(aux,(x1,y1),(x2,y2),(100,200,50))
+
         cv2.imshow("image",aux)
 
 
@@ -140,10 +159,10 @@ def saturate(image,value):
             else:
                 im2[i][j][1] += value
 
-    return cv2.cvtColor(im2, cv.CV_HSV2BGR);
+    return cv2.cvtColor(im2, cv.CV_HSV2BGR)
 
 
-nimg = tilt_shift(image,(ix,iy),(ix2,iy2),0,dist/2,0.05)
+nimg = tilt_shift(image,(ix,iy),(ix2,iy2),0,dist,0.05)
 
 simg = saturate(nimg,30)
 
@@ -151,3 +170,4 @@ cv2.imshow("hai",nimg)
 cv2.imshow("hais",simg)
 
 cv2.waitKey(0)
+cv2.destroyAllWindows()
