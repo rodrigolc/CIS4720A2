@@ -51,10 +51,6 @@ def dist_point(p1,p2):
     x2,y2 = p2
     return np.sqrt((y2-y1)**2 + (x2 - x1) ** 2)
 
-def gaussian_blur(image,x,y,distance):
-    kernel = cv2.getGaussianKernel(25, distance)
-
-
 def square_blur(image,x,y,distance):
     min_x = max(x - distance, 0)
     max_x = min(x + distance, len(image[0]))
@@ -84,11 +80,15 @@ def tilt_shift(image,p1,p2,type,distance,ratio):
 height = len(image)
 width = len(image[0])
 
-ix,iy = -1,-1
-ix2,iy2 = -1,-1
+ix = 0
+iy = height/2
+ix2 = width - 1
+iy2 = height/2
+
+
 # mouse callback function
 def get_mouse_point(event,x,y,flags,param):
-    global ix,iy,ix2,iy2,image
+    global ix,iy,ix2,iy2,image,width,height
     print "move", x,y
     print event
     if event == 1: #press down left button
@@ -97,15 +97,28 @@ def get_mouse_point(event,x,y,flags,param):
         ix2,iy2 = x,y
         aux = np.copy(image)
         cv2.line(aux,(ix,iy),(ix2,iy2),(200,100,50),2)
+        dx = ix2 - ix
+        dy = iy2 - iy
+
+        #same line, offset by distance between (ix,iy) and (ix2,iy2)
+        y1 = iy - dx
+        x1 = ix + dy
+        y2 = iy2 - dx
+        x2 = ix2 + dy
+
+        p1 = ((x2*y1 - x1 * y2) / (y1 - y2),0)
+        p2 = (width,(width*y2 + x2*y1 - x1*y2 - width*y1)/(x2-x1))
+
+        cv2.line(aux,p1,p2,(100,200,50),2)
+
+        y1 = iy - dx
+        x1 = ix + dy
+        y2 = iy2 - dx
+        x2 = ix2 + dy
+
+        p1 = ((x2*y1 - x1 * y2) / (y1 - y2),0)
+        p2 = (width,(width*y2 + x2*y1 - x1*y2 - width*y1)/(x2-x1))
         cv2.imshow("image",aux)
-
-if ix == -1 and iy == -1:
-    ix = 0
-    iy = height/2
-
-if ix2 == -1 and iy2 == -1:
-    ix2 = width - 1
-    iy2 = height/2
 
 
 cv2.namedWindow('image')
